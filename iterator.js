@@ -1,7 +1,7 @@
 const addIteratorToObject = (o) => {
-    const returnValue = value => {
+    const returnValue = ({value, done = false}) => {
         return {
-            done: false,
+            done,
             value
         }
     }
@@ -11,48 +11,83 @@ const addIteratorToObject = (o) => {
         let keys = Object.keys(o);
         let keysIndex = 0;
         let iterators = {};
+        let handleObject = function(key, o){
+            const iteration = iterators[key].next();
+            
+            if(iteration.done){
+                keysIndex++
+                if(keysIndex > keys.length - 1){
+                    return returnValue({ done: true})
+                }
+                const currentKey = keys[keysIndex];
+                const currentValue = o[currentKey];
+                if(typeof currentValue === "object"){
+                    return handleObject(currentKey, o)
+                }else{
+                    keysIndex++;
+                    return returnValue({value: currentValue}) 
+                }
+                
+            } 
+            return returnValue({ value: iteration.value});
+        }
+
         for(var key in o){
             if(typeof o[key] === "object"){
-                addIteratorToObject(o[key]);
+                addIteratorToObject(o[key]);        
                 iterators[key] = o[key][Symbol.iterator]()
             }
         }
         return {
             next() {
-                
+
                 if(keysIndex > keys.length - 1){
-                    return { done: true };
+                    return returnValue({ done: true})
                 }
-                
-                if(typeof o[keys[keysIndex]] === "object"){
-                    
-                    const sub = iterators[keys[keysIndex]].next();
-                    
-                    if(sub.done){
-                        keysIndex++;
-                        return returnValue(o[keys[keysIndex - 1]]) 
-                    } 
-                    return {
-                        done: false,
-                        value: sub.value
-                    }
-                    
+                const currentKey = keys[keysIndex];
+                const currentValue = o[currentKey];
+                if(typeof currentValue === "object"){
+                    return handleObject(currentKey, o)
                 }
+
                 keysIndex++;
-                return returnValue(o[keys[keysIndex - 1]])
+                return returnValue({ value: currentValue})
             }
         }
     }
 }
 
 const foo = {
-    bar: "bar",
+    bar: "one",
     thisIsObject: {
-        goo: "goo",
-        doo: "doo"
+        goo: "two",
+        doo: "three",
     },
-    goo: "goo",
-    doo: "doo"
+    hoo: {
+        oo: "four",
+        teww: {
+            tboo: "five",
+            oo: "six",
+            jj: "seven"
+        },
+    },
+    too: "eight",
+    eww: {
+        boo: "nine"
+    },
+    goo: "ten",
+    doo: "eleven",
+    hh: {
+        oo: "12",
+        jj: {
+            tboo: "13",
+            oo: "14",
+            jj: "15"
+        },
+    },
+
+
+
 }
 
 addIteratorToObject(foo);
@@ -60,14 +95,26 @@ addIteratorToObject(foo);
 const fi = foo[Symbol.iterator]()
 
 
-console.log(fi.next())
-console.log(fi.next())
-console.log(fi.next())
-console.log(fi.next())
-console.log(fi.next())
-console.log(fi.next())
-console.log(fi.next())
-console.log(fi.next())
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
+console.log(fi.next().value)
 
 
 
